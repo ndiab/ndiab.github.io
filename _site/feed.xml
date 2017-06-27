@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-06-27T09:07:47+02:00</updated><id>http://localhost:4000/</id><title type="html">NDiab</title><subtitle>Student in the University of Pierre and Marie Curie (UPMC, Paris6), I currently doing my master degree on computer sciences speciality Security and HPC.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-06-27T13:57:30+02:00</updated><id>http://localhost:4000/</id><title type="html">NDiab</title><subtitle>Student in the University of Pierre and Marie Curie (UPMC, Paris6), I currently doing my master degree on computer sciences speciality Security and HPC.
 </subtitle><entry><title type="html">Welcome to Jekyll!</title><link href="http://localhost:4000/jekyll/update/2017/06/26/welcome-to-jekyll.html" rel="alternate" type="text/html" title="Welcome to Jekyll!" /><published>2017-06-26T19:42:27+02:00</published><updated>2017-06-26T19:42:27+02:00</updated><id>http://localhost:4000/jekyll/update/2017/06/26/welcome-to-jekyll</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2017/06/26/welcome-to-jekyll.html">&lt;p&gt;You’ll find this post in your &lt;code class=&quot;highlighter-rouge&quot;&gt;_posts&lt;/code&gt; directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run &lt;code class=&quot;highlighter-rouge&quot;&gt;jekyll serve&lt;/code&gt;, which launches a web server and auto-regenerates your site when a file is updated.&lt;/p&gt;
 
 &lt;p&gt;To add new posts, simply add a file in the &lt;code class=&quot;highlighter-rouge&quot;&gt;_posts&lt;/code&gt; directory that follows the convention &lt;code class=&quot;highlighter-rouge&quot;&gt;YYYY-MM-DD-name-of-post.ext&lt;/code&gt; and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.&lt;/p&gt;
@@ -16,7 +16,7 @@
 &lt;p&gt;Cet article a pour but de présenter la résolution du challenge CRYPTO unlucky présenté à la quinzième édition de la &lt;a href=&quot;https://nuitduhack.com&quot;&gt; nuit du hack &lt;/a&gt;. Ce challenge n’a pas été résolu lors de la wargame (du moins dans le temps imparti) et était récompensé de 350 points.
 &lt;br /&gt;&lt;/p&gt;
 
-&lt;h2&gt; Présentation de l'épreuve &lt;/h2&gt;
+&lt;h2&gt; &lt;b&gt;Présentation de l'épreuve &lt;/b&gt;&lt;/h2&gt;
 
 &lt;p&gt;L’épreuve se présente sous forme d’un fichier texte&lt;/p&gt;
 
@@ -25,13 +25,12 @@
 &lt;p&gt;Contenant une clé publique d’un serveur 32 bits avec Go 1.5.1, un message chiffré avec cette clé publique (le message que nous devrons déchiffrer) ainsi que 61 signatures du serveur interceptés avec le clair correspondant.
 L’algorithme de chiffrement utilisé ici est RSA avec des clés 4096 bits, ne présentant à première vue aucun signe de faiblesse.&lt;/p&gt;
 
-&lt;h2&gt;CVE-2015-8618&lt;/h2&gt;
+&lt;h2&gt;&lt;b&gt;CVE-2015-8618&lt;/b&gt;&lt;/h2&gt;
 &lt;p&gt;Je remercie mon partenaire &lt;a href=&quot;https://twitter.com/0xBytemare&quot;&gt;@0xBytemare&lt;/a&gt; de m’avoir rapidement trouvé cette &lt;a href=&quot;http://www.openwall.com/lists/oss-security/2016/01/13/7&quot;&gt;CVE&lt;/a&gt; concernant une mise à jour de sécurité de Go v1.5.3.
 En effet, la vulnérabilité publiée en 2015 concerne une bibliothèque de mathématique de Go (math/big) qui est utilisée pour le chiffrement RSA. Celle ci a la probabilité d’effectuer une erreur de calcul de 1/2^26 (1 fois sur 64 millions) sur une architecture 32 bits. Si cette erreur intervient lors d’un chiffrement RSA_CRT, cela pourrait permettre à un attaquant d’en déduire la clé privée (Détails expliqués plus bas). La CVE n’en dit pas plus quant à son exploitation, aucun POC n’est trouvable sur le net.&lt;/p&gt;
 
-&lt;p&gt;Cette CVE correspond parfaitement à notre scénario, afin de pouvoir l’exploiter, il va donc falloir dans un premier temps trouver une signature qui a échouée.&lt;/p&gt;
+&lt;p&gt;Cette CVE correspond parfaitement à notre scénario, afin de pouvoir l’exploiter, il va donc falloir dans un premier temps trouver une signature qui a échouée.
+&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;h2&gt;Un peu de maths&lt;/h2&gt;
-&lt;h3&gt;RSA_CRT&lt;/h3&gt;
-&lt;p&gt;Rappel : &lt;math&gt;\bar{A}&lt;/math&gt;&lt;/p&gt;
-&lt;h1&gt;Recherche d'une signature défailante &lt;/h1&gt;</content><author><name></name></author><summary type="html"></summary></entry></feed>
+&lt;h2&gt;&lt;b&gt;Un peu de maths&lt;/b&gt;&lt;/h2&gt;
+&lt;h3&gt;&amp;emsp;&amp;emsp;RSA_CRT&lt;/h3&gt;</content><author><name></name></author><summary type="html"></summary></entry></feed>
