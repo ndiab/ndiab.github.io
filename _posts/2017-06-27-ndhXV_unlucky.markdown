@@ -222,3 +222,8 @@ Et nous obtenons ce résultat :
 
 <b> FLAG = ndh2k17_Y0d3lAyE30OoO0 </b>
 
+
+<br/> <br/> <br/>
+Si vous avez la moindre question n'hésitez pas à me contacter sur <a href="https://twitter.com/end_iab">twitter</a> ou par mail ;)
+
+
