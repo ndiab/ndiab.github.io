@@ -51,7 +51,7 @@ Pour commencer, quelques rappels...
 
 <br/>
 
-Dans RSA_CRT, le déchiffrement va donc être utilisé différement que dans un RSA classique :
+Dans RSA_CRT, le déchiffrement va donc être effectué différemment d'un RSA classique :
 
  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;![unlucky]({{ site.url }}/assets/RSA_CRT.png)
 
@@ -106,7 +106,7 @@ print(r)			# print clear message
 f.close()
 {% endhighlight %}
 
-note : le script proposé ci-dessus permet d'afficher sur le terminal la valeur du clair et la vérification se fait manuellement. Il est possible d'effectuer cette recherche de façon automatique avec un code plus évolué.
+note : le script proposé ci-dessus permet d'afficher sur le terminal la valeur du clair et la vérification se fait manuellement. Il est possible d'effectuer cette recherche de façon automatique avec un code plus élaboré.
 
 Après avoir testé chaque signature une par une, nous trouvons enfin une signature erronée :
  
