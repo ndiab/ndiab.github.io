@@ -19,20 +19,20 @@ L'épreuve se présente sous forme d'un fichier texte
 
 ![unlucky]({{ site.url }}/assets/unlucky.png)
 
-Contenant une clé publique d’un serveur 32 bits avec Go 1.5.1, un message chiffré avec cette clé publique (le message que nous devrons déchiffrer) ainsi que 61 signatures du serveur interceptés avec le clair correspondant.
+Contenant une clé publique d’un serveur 32 bits avec Go 1.5.1, un message chiffré avec cette clé publique (le message que nous devrons déchiffrer) ainsi que 61 signatures interceptés avec le clair correspondant.
 L’algorithme de chiffrement utilisé ici est RSA avec des clés 4096 bits, ne présentant à première vue aucun signe de faiblesse.
 
 <h2><b>CVE-2015-8618</b></h2>
 Je remercie mon partenaire <a href="https://twitter.com/0xBytemare">@0xBytemare</a> de m’avoir rapidement trouvé cette <a href = "http://www.openwall.com/lists/oss-security/2016/01/13/7">CVE</a> concernant une mise à jour de sécurité de Go v1.5.3.
-En effet, la vulnérabilité publiée en 2015 concerne une bibliothèque de mathématique de Go (math/big) qui est utilisée pour le chiffrement RSA. Celle ci a la probabilité d’effectuer une erreur de calcul de 1/2^26 (1 fois sur 64 millions) sur une architecture 32 bits. Si cette erreur intervient lors d’un chiffrement RSA_CRT, cela pourrait permettre à un attaquant d’en déduire la clé privée (Détails expliqués plus bas). La CVE n'en dit pas plus quant à son exploitation, aucun POC n'est trouvable sur le net.
+En effet, la vulnérabilité publiée en 2015 concerne une bibliothèque de mathématique de Go (math/big) qui est utilisée pour le chiffrement RSA. Celle-ci a la probabilité d’effectuer une erreur de calcul de 1/2^26 (1 fois sur 64 millions) sur une architecture 32 bits. Si cette erreur intervient lors d’un chiffrement RSA_CRT, cela pourrait permettre à un attaquant d’en déduire la clé privée (Détails expliqués plus bas). La CVE n'en dit pas plus quant à son exploitation, aucun POC n'est trouvable sur le net.
 
-Cette CVE correspond parfaitement à notre scénario. Nous sommes dans de la pûre crypto, afin de pouvoir exploiter une telle vulnérabilité nous allons être obligé de passer par un peu de mathématiques...
+Cette CVE correspond parfaitement à notre scénario. Nous sommes dans de la pûre crypto, afin de pouvoir exploiter une telle vulnérabilité nous allons être obligés de passer par un peu de mathématiques...
 <br/><br/>
 
 
 <h2><b>Un peu de maths</b></h2>
-Nous allons voir dans cette partie comment avec les informations dont nous disponsons nous pouvons monter une attaque afin de récupérer la clé privé.
-Pour ceux dont ils ne s'interressent juste à casser du chiffrement sans vouloir savoir comment cela se fait ou pour les alergiques aux maths, je vous suggère de vous diriger directement vers la partie <b>Résumé de l'exploitation. </b>
+Nous allons voir dans cette partie comment avec les informations dont nous disposons, pouvons monter une attaque afin de récupérer la clé privée.
+Pour ceux dont ils ne s'intéressent juste à casser du chiffrement sans vouloir savoir comment cela se fait, je vous suggère de vous diriger directement vers la partie <b>Résumé de l'exploitation. </b>
 <h3>&emsp;&emsp;RSA_CRT</h3>
 Pour commencer, quelques rappels...
 
@@ -55,12 +55,12 @@ Dans RSA_CRT, le déchiffrement va donc être utilisé différement que dans un 
 
  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;![unlucky]({{ site.url }}/assets/RSA_CRT.png)
 
-note : Ce déchiffrement est beaucoup plus faible en ressource de calcul qu'un déchiffrement classique, il est surtout utilisé sur les cartes à puces.
+note : Ce déchiffrement est beaucoup plus faible en ressources de calcul qu'un déchiffrement classique, il est surtout utilisé sur les cartes à puce.
 
 <br/><br/>
 
 <h3>Que se passe-t-il si un des deux sous déchiffrement est faux ?</h3>
-On va essayer sur le papier ... <br/>
+On va essayer sur du papier ... <br/>
  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;![unlucky]({{ site.url }}/assets/Bellecore.png)
 
 Ceci est <a href="https://eprint.iacr.org/2012/553.pdf">l'attaque de Bellcore</a> que nous retrouverons dans la catégorie des <a href="https://fr.wikipedia.org/wiki/Attaque_par_faute">attaques par faute</a>.
@@ -68,7 +68,7 @@ Ceci est <a href="https://eprint.iacr.org/2012/553.pdf">l'attaque de Bellcore</a
 <br/>
 
 <h2> <b>Résumé de l'exploitation </b></h2>
-C'est pas mal de faire des preuves sur le papier... Mais c'est mieux quand c'est appliqué ;)
+Ce n'est pas mal de faire des preuves sur le papier... Mais c'est mieux quand c'est appliqué ;)
 
 Si nous récapitulons, voici notre feuille de route pour pouvoir résoudre ce challenge :
 <ol>
@@ -76,7 +76,7 @@ Si nous récapitulons, voici notre feuille de route pour pouvoir résoudre ce ch
 	<li>Récupérer le message faux ainsi que le message clair sous forme d'entiers afin de pouvoir effectuer des calculs </li>
 	<li>Calculer <i>q = pgcd(message_faux - message, N)</i></li>
 	<li>En déduire l'exposant privé d</li>
-	<li>Construire une clé privé utilisable par une bibliothèque de cryptographie(ex : format PEM)</li>
+	<li>Construire une clé privée utilisable par une bibliothèque de cryptographie(ex : format PEM)</li>
 	<li>Déchiffrer</li>
 </ol>
 
@@ -84,7 +84,7 @@ Si nous récapitulons, voici notre feuille de route pour pouvoir résoudre ce ch
 
 <h2> <b> I - Trouver une mauvaise signature </b></h2>
 
-La première étape de notre exploitation consiste à retrouver parmis les signatures données, une qui serait mauvaise. Voici le script permettant de vérifier une signature :
+La première étape de notre exploitation consiste à retrouver parmi les signatures données, une qui serait mauvaise. Voici le script permettant de vérifier une signature :
 
 
 {% highlight python %}
@@ -106,18 +106,18 @@ print(r)			# print clear message
 f.close()
 {% endhighlight %}
 
-note : Le script proposé ci-dessus permet d'afficher sur le terminal la valeur du clair et la vérification se fait manuellement. Il est possible d'effectuer cette recherche de façon automatique avec un code plus évolué.
+note : le script proposé ci-dessus permet d'afficher sur le terminal la valeur du clair et la vérification se fait manuellement. Il est possible d'effectuer cette recherche de façon automatique avec un code plus évolué.
 
-Après avoir tester chaque signature une par une, nous trouvons enfin une signature erronée :
+Après avoir testé chaque signature une par une, nous trouvons enfin une signature erronée :
  
 ![unlucky]({{ site.url }}/assets/pic_sans_nom.png)
-En effet, au lieu de récupérer le clair "Pic Sans Nom (3913 m)", nous nous retrouvons avec un binaire complétement incompréhensible ! Voici donc notre signature érronée.
+En effet, au lieu de récupérer le clair "Pic Sans Nom (3913 m)", nous nous retrouvons avec un binaire complétement incompréhensible !
 
-Nous rappelons que la probabilité de tomber sur une telle signature avec une base de 61 signature est exactement de <b>1 chance sur 1 100 145</b>, ce qui explique le titre "unlucky" 
+Nous rappelons que la probabilité de tomber sur une telle signature avec une base de 61 signatures est exactement de <b>1 chance sur 1 100 145</b>, ce qui explique le titre "unlucky" 
 
 
 <h2> <b> II - Transformer les messages en entiers </b></h2>
-Afin que nous puissions effectuer nos calculs mathématiques, il faut d'abord convertir deux messages (Le mauvais ainsi que le clair) sous forme d'entiers. 
+Afin que nous puissions effectuer nos calculs mathématiques, il faut d'abord convertir deux messages (le mauvais ainsi que le clair) sous forme d'entiers. 
 
 Pour le message erroné, pas trop de problèmes, il suffit d'ajouter les lignes suivantes au code précédent :
 
@@ -130,7 +130,7 @@ ce qui nous permet de récupérer la valeur mFault (en hexadecimal) :
 
 ![mfault]({{ site.url }}/assets/mfault.png)
 
-Pour le message clair, c'est un peu plus compliqué car il faut lui appliquer le padding adéquat pour que les calculs soient bon... soit PCKS1. Après une dizaine de minutes de recherches sur le net qui ne mènent à rien, j'ai décidé d'utilisé une méthode un peu maison, j'ai récupéré un message d'un même nombre de caractère que ma chaîne avec un padding PCKS1, et ai changé les caractères par les miens... ce n'est pas une procédure habituelle... mais ça fonctionne !
+Pour le message clair, c'est un peu plus compliqué car il faut lui appliquer le padding adéquat pour que les calculs soient bons... soit PCKS1. Après une dizaine de minutes de recherches sur le net qui ne mènent à rien, j'ai décidé d'utiliser une méthode un peu maison, j'ai récupéré un message d'un même nombre de caractères que ma chaîne avec un padding PCKS1, et ai changé les caractères par les miens... ce n'est pas une procédure habituelle... mais ça fonctionne !
 
 Voici donc la valeur de notre message clair :
 
@@ -145,7 +145,7 @@ Nous rappelons les étapes pour pouvoir déterminer cet exposant privé :
 	<li>Calculer q = pgcd(message_faux - message, N)</li>
 	<li>Calculer p = N / q</li>
 	<li>Calculer phi = (p-1) * (q - i)</li>
-	<li>Calculer d par le biais de l'algorithme d'euclide étendu appliqué sur e et phi</li>
+	<li>Calculer d par le biais de l'algorithme d'Euclide étendu appliqué sur e et phi</li>
 </ol>
 
 Voici le code python pour effectuer l'ensemble de ces étapes :
