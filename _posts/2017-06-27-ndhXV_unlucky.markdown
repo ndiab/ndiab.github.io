@@ -7,13 +7,12 @@ categories: CTF-WriteUp
 
 ![ndhXV]({{ site.url }}/assets/nuit_hack_XV_2017.jpg)
 
-Cet article a pour but de présenter la résolution du challenge CRYPTO unlucky présenté à la quinzième édition de la <a href="https://nuitduhack.com"> nuit du hack </a>. Ce challenge n'a pas été résolu lors de la wargame (du moins dans le temps imparti) et était récompensé de 350 points.
+Cet article a pour but de présenter la résolution du challenge CRYPTO unlucky présenté à la quinzième édition de la [nuit du hack](https://nuitduhack.com). Ce challenge n'a pas été résolu lors de la wargame (du moins dans le temps imparti) et était récompensé de 350 points.
 
 Je tiens à préciser que je ne suis pas l'auteur du chall et n'ai aucune connaissance de la personne qui aurait pu l'écrire. Ce qui implique que ce chall était donc réalisable par une personne tierce.
-<br/>
 
 
-<h2> <b>Présentation de l'épreuve </b></h2>
+## Présentation de l'épreuve
 
 L'épreuve se présente sous forme d'un fichier texte
 
@@ -22,67 +21,62 @@ L'épreuve se présente sous forme d'un fichier texte
 Contenant une clé publique d’un serveur 32 bits avec Go 1.5.1, un message chiffré avec cette clé publique (le message que nous devrons déchiffrer) ainsi que 61 signatures interceptés avec le clair correspondant.
 L’algorithme de chiffrement utilisé ici est RSA avec des clés 4096 bits, ne présentant à première vue aucun signe de faiblesse.
 
-<h2><b>CVE-2015-8618</b></h2>
-Je remercie mon partenaire <a href="https://twitter.com/0xBytemare">@0xBytemare</a> de m’avoir rapidement trouvé cette <a href = "http://www.openwall.com/lists/oss-security/2016/01/13/7">CVE</a> concernant une mise à jour de sécurité de Go v1.5.3.
+## CVE-2015-8618
+
+Je remercie mon partenaire [@0xBytemare](https://twitter.com/0xBytemare) de m’avoir rapidement trouvé cette [CVE](http://www.openwall.com/lists/oss-security/2016/01/13/7) concernant une mise à jour de sécurité de Go v1.5.3.
 En effet, la vulnérabilité publiée en 2015 concerne une bibliothèque de mathématique de Go (math/big) qui est utilisée pour le chiffrement RSA. Celle-ci a la probabilité d’effectuer une erreur de calcul de 1/2^26 (1 fois sur 64 millions) sur une architecture 32 bits. Si cette erreur intervient lors d’un chiffrement RSA_CRT, cela pourrait permettre à un attaquant d’en déduire la clé privée (Détails expliqués plus bas). La CVE n'en dit pas plus quant à son exploitation, aucun POC n'est trouvable sur le net.
 
 Cette CVE correspond parfaitement à notre scénario. Nous sommes dans de la pûre crypto, afin de pouvoir exploiter une telle vulnérabilité nous allons être obligés de passer par un peu de mathématiques...
-<br/><br/>
 
 
-<h2><b>Un peu de maths</b></h2>
+## Un peu de maths
+
 Nous allons voir dans cette partie comment avec les informations dont nous disposons, pouvons monter une attaque afin de récupérer la clé privée.
-Pour ceux dont ils ne s'intéressent juste à casser du chiffrement sans vouloir savoir comment cela se fait, je vous suggère de vous diriger directement vers la partie <b>Résumé de l'exploitation. </b>
-<h3>&emsp;&emsp;RSA_CRT</h3>
+Pour ceux dont ils ne s'intéressent juste à casser du chiffrement sans vouloir savoir comment cela se fait, je vous suggère de vous diriger directement vers la partie **Résumé de l'exploitation.**
+
+### RSA_CRT
+
 Pour commencer, quelques rappels...
 
 
-<b>&emsp;&emsp;&emsp;&emsp;RSA</b> <br/>
+**RSA**
 
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;![unlucky]({{ site.url }}/assets/RSA.png)
+![unlucky]({{ site.url }}/assets/RSA.png)
 
-<br/>
+**CRT** - _**C**hiness **R**emainder **T**heorem_
 
-<b>&emsp;&emsp;&emsp;&emsp;CRT</b> - <b>C</b>hiness <b>R</b>emainder <b>T</b>heorem <i> <br/>
+![unlucky]({{ site.url }}/assets/CRT.png)
 
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;![unlucky]({{ site.url }}/assets/CRT.png)
-
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<i>(* U et V sont issus de <a href = "https://fr.wikipedia.org/wiki/Th%C3%A9or%C3%A8me_de_Bachet-B%C3%A9zout">l'identité de bézout</a>)</i>
-
-<br/>
+_(\* U et V sont issus de [l'identité de bézout](https://fr.wikipedia.org/wiki/Th%C3%A9or%C3%A8me_de_Bachet-B%C3%A9zout))_
 
 Dans RSA_CRT, le déchiffrement va donc être effectué différemment d'un RSA classique :
 
- &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;![unlucky]({{ site.url }}/assets/RSA_CRT.png)
+![unlucky]({{ site.url }}/assets/RSA_CRT.png)
 
 note : Ce déchiffrement est beaucoup plus faible en ressources de calcul qu'un déchiffrement classique, il est surtout utilisé sur les cartes à puce.
 
-<br/><br/>
+### Que se passe-t-il si un des deux sous déchiffrement est faux ?
 
-<h3>Que se passe-t-il si un des deux sous déchiffrement est faux ?</h3>
-On va essayer sur du papier ... <br/>
- &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;![unlucky]({{ site.url }}/assets/Bellecore.png)
+On va essayer sur du papier ...
 
-Ceci est <a href="https://eprint.iacr.org/2012/553.pdf">l'attaque de Bellcore</a> que nous retrouverons dans la catégorie des <a href="https://fr.wikipedia.org/wiki/Attaque_par_faute">attaques par faute</a>.
+![unlucky]({{ site.url }}/assets/Bellecore.png)
 
-<br/>
+Ceci est [l'attaque de Bellcore](https://eprint.iacr.org/2012/553.pdf) que nous retrouverons dans la catégorie des [attaques par faute](https://fr.wikipedia.org/wiki/Attaque_par_faute).
 
-<h2> <b>Résumé de l'exploitation </b></h2>
+## Résumé de l'exploitation
+
 Ce n'est pas mal de faire des preuves sur le papier... Mais c'est mieux quand c'est appliqué ;)
 
 Si nous récapitulons, voici notre feuille de route pour pouvoir résoudre ce challenge :
-<ol>
-	<li>Trouver une mauvaise signature dans la liste des signatures données</li>
-	<li>Récupérer le message faux ainsi que le message clair sous forme d'entiers afin de pouvoir effectuer des calculs </li>
-	<li>Calculer <i>q = pgcd(message_faux - message, N)</i></li>
-	<li>En déduire l'exposant privé d</li>
-	<li>Construire une clé privée utilisable par une bibliothèque de cryptographie(ex : format PEM)</li>
-	<li>Déchiffrer</li>
-</ol>
 
+1. Trouver une mauvaise signature dans la liste des signatures données
+2. Récupérer le message faux ainsi que le message clair sous forme d'entiers afin de pouvoir effectuer des calculs
+3. Calculer _q = pgcd(message_faux - message, N)_
+4. En déduire l'exposant privé d
+5. Construire une clé privée utilisable par une bibliothèque de cryptographie (ex : format PEM)
+6. Déchiffrer
 
-
-<h2> <b> I - Trouver une mauvaise signature </b></h2>
+## I - Trouver une mauvaise signature
 
 La première étape de notre exploitation consiste à retrouver parmi les signatures données, une qui serait mauvaise. Voici le script permettant de vérifier une signature :
 
@@ -111,12 +105,14 @@ note : le script proposé ci-dessus permet d'afficher sur le terminal la valeur 
 Après avoir testé chaque signature une par une, nous trouvons enfin une signature erronée :
  
 ![unlucky]({{ site.url }}/assets/pic_sans_nom.png)
+
 En effet, au lieu de récupérer le clair "Pic Sans Nom (3913 m)", nous nous retrouvons avec un binaire complétement incompréhensible !
 
-Nous rappelons que la probabilité de tomber sur une telle signature avec une base de 61 signatures est exactement de <b>1 chance sur 1 100 145</b>, ce qui explique le titre "unlucky" 
+Nous rappelons que la probabilité de tomber sur une telle signature avec une base de 61 signatures est exactement de **1 chance sur 1 100 145**, ce qui explique le titre "unlucky" 
 
 
-<h2> <b> II - Transformer les messages en entiers </b></h2>
+## II - Transformer les messages en entiers
+
 Afin que nous puissions effectuer nos calculs mathématiques, il faut d'abord convertir deux messages (le mauvais ainsi que le clair) sous forme d'entiers. 
 
 Pour le message erroné, pas trop de problèmes, il suffit d'ajouter les lignes suivantes au code précédent :
@@ -138,15 +134,14 @@ Voici donc la valeur de notre message clair :
 
 Nous avons maintenant effectuer tout les calculs que nous souhaitons avec ces messages !
 
-<h2> <b> III - Calcul de l'exposant privé d </b></h2>
+## III - Calcul de l'exposant privé d
 
 Nous rappelons les étapes pour pouvoir déterminer cet exposant privé :
-<ol>
-	<li>Calculer q = pgcd(message_faux - message, N)</li>
-	<li>Calculer p = N / q</li>
-	<li>Calculer phi = (p-1) * (q - i)</li>
-	<li>Calculer d par le biais de l'algorithme d'Euclide étendu appliqué sur e et phi</li>
-</ol>
+
+1. Calculer q = pgcd(message_faux - message, N)
+2. Calculer p = N / q
+3. Calculer phi = (p-1) * (q - i)
+4. Calculer d par le biais de l'algorithme d'Euclide étendu appliqué sur e et phi
 
 Voici le code python pour effectuer l'ensemble de ces étapes :
 
@@ -175,17 +170,18 @@ d = euclide_algorithm(65537, phi)["U"] % phi
 
 print("d = ", d)
 {% endhighlight %}
-J'utilise dans ce code ma propre <a href="https://github.com/ndiab/crypto">bibliothèque cryptographique</a> disponible sur <a href="https://github.com/ndiab">mon github</a>.
+
+J'utilise dans ce code ma propre [bibliothèque cryptographique](https://github.com/ndiab/crypto) disponible sur [mon github](https://github.com/ndiab).
 
 Nous obtenons donc comme résultat :
+
 ![private]({{ site.url }}/assets/private.png)
 
-<br/>
 Nous avons donc maintenant notre exposant privé, c'est presque gagné !
 
-<h2> <b> IV - Construction de la clé privée </b></h2>
+## IV - Construction de la clé privée
 
-Pour cela j'utilise l'outil <a href="https://github.com/ius/rsatool">rsatool</a>
+Pour cela j'utilise l'outil [rsatool](https://github.com/ius/rsatool)
 
 {% highlight bash %}
 python rsatool.py -n 828821012401267005051930593209588896472426297219477242130462814691925111631891312444258173488894225851927023491261837476773343905960917835489446504143517756310774928306223114111671426162481308790418796978507078145565567737809342336464198732642155751098994137993825975849016994666292054356449169824255020323180011275935389533427093009748065862422119679884569299089265204183851144870775968939924030201127448093346089172683541211474705604390471107737112885402413177952689087283914110401424448803268754588417799207317993589133196201894042967098758147607714556460581984785446709240387660990947352283396724595446096012328681845726929426798643360131595910744317120606725181337495917759892546943582110853816535122965353209789539140127862370351833546861584000320886698575749033832757971327463810681316790977928362676955163457483302232523365241898242188321893642379107638372782480021508628857042597848963995828566510618682774464978101266972685105389295927054772334931656290664686073530758014279292167425111830975163118718062325085672633019216699176085492403718885750493120165129236275529254810428072282942577035818602072562396240212443038039802451812613694072645913730526991619816700970900177099338243334311123679519911803522456716044552666877 -d 185892550182129540675623354587297971973819279839313608832807008455629754426921744993181727758567774322863044055999782551399841037485993122417250929465882898210355687186980996297167375576579836701563481648337207099221329633307284785749839894580268358109222497739769107817030086891371697010626765754409334326112318014937734268456670890493718359274039659652155028873965992283724124974526389176311752444060185231611061915395507457885876644932412756345695138662588633943063870698784709534927414635385315527032870447966296714324257304601073249818951828916273193240674650874487406795008288888809910908550108409424632883488997752586286938567354742297649824362806530577356356618794488266204587425863990135884991210112726481412637978026441437768833343469412964238376005975363914231323896708789537862905204224658022449735876053924953975814793586963995446373854676482484853280138792012242266112719262936756740801542129646412429458617841243435170915324965727970290376208937547108841525394362679468238272840382921601857009246758326934013408956042524317376855233752949181211370376156557030970795099593268453811691094904326326625238986472144367339800522747067319590768243951098790307257378800625122918326579979852342701101391901867452257648828931733 -o priv.pem
@@ -195,7 +191,7 @@ qui nous génère la clé privée priv.pem suivante :
 
 ![privkey]({{ site.url }}/assets/privkey.png)
 
-<h2> <b> V - Déchiffrement du message chiffré </b></h2>
+## V - Déchiffrement du message chiffré
 
 Voici le code python permettant d'effectuer cette action
 
@@ -220,10 +216,9 @@ Et nous obtenons ce résultat :
 ![resultat]({{ site.url }}/assets/resultat.png)
 
 
-<b> FLAG = ndh2k17_Y0d3lAyE30OoO0 </b>
+**FLAG = ndh2k17_Y0d3lAyE30OoO0**
 
 
-<br/> <br/> <br/>
-Si vous avez la moindre question n'hésitez pas à me contacter sur <a href="https://twitter.com/end_iab">twitter</a> ou par mail ;)
+Si vous avez la moindre question n'hésitez pas à me contacter sur [twitter](https://twitter.com/end_iab) ou par mail ;)
 
 
