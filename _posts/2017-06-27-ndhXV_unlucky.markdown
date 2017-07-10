@@ -19,14 +19,16 @@ L'épreuve se présente sous forme d'un fichier texte
 
 ![unlucky]({{ site.url }}/assets/unlucky.png)
 
-Contenant une clé publique d’un serveur 32 bits avec Go 1.5.1, un message chiffré avec cette clé publique (le message que nous devrons déchiffrer) ainsi que 61 signatures interceptés avec le clair correspondant.
-L’algorithme de chiffrement utilisé ici est RSA avec des clés 4096 bits, ne présentant à première vue aucun signe de faiblesse.
+Contenant une clé publique d’un serveur 32 bits, un message chiffré avec cette clé publique (le message que nous devrons déchiffrer) ainsi que 61 signatures interceptés avec le clair correspondant.
+L’algorithme de chiffrement utilisé ici est RSA avec des clés 4096 bits, ne présentant à première vue aucun signe de faiblesse. <br/>
+Nous savons également que le serveur utilise le language Go 1.5.1.
 
 <h2><b>CVE-2015-8618</b></h2>
-Je remercie mon partenaire <a href="https://twitter.com/0xBytemare">@0xBytemare</a> de m’avoir rapidement trouvé cette <a href = "http://www.openwall.com/lists/oss-security/2016/01/13/7">CVE</a> concernant une mise à jour de sécurité de Go v1.5.3.
+Je remercie mon partenaire <a href="https://twitter.com/_Bytemare">@_Bytemare</a> de m’avoir rapidement trouvé cette <a href = "http://www.openwall.com/lists/oss-security/2016/01/13/7">CVE</a> concernant une mise à jour de sécurité de Go v1.5.3.
 En effet, la vulnérabilité publiée en 2015 concerne une bibliothèque de mathématique de Go (math/big) qui est utilisée pour le chiffrement RSA. Celle-ci a la probabilité d’effectuer une erreur de calcul de 1/2^26 (1 fois sur 64 millions) sur une architecture 32 bits. Si cette erreur intervient lors d’un chiffrement RSA_CRT, cela pourrait permettre à un attaquant d’en déduire la clé privée (Détails expliqués plus bas). La CVE n'en dit pas plus quant à son exploitation, aucun POC n'est trouvable sur le net.
 
-Cette CVE correspond parfaitement à notre scénario. Nous sommes dans de la pûre crypto, afin de pouvoir exploiter une telle vulnérabilité nous allons être obligés de passer par un peu de mathématiques...
+Cette CVE correspond parfaitement à notre scénario. 
+Néanmoins, afin de pouvoir exploiter une telle vulnérabilité nous allons être obligés de passer par un peu de mathématiques...
 <br/><br/>
 
 
@@ -113,7 +115,7 @@ Après avoir testé chaque signature une par une, nous trouvons enfin une signat
 ![unlucky]({{ site.url }}/assets/pic_sans_nom.png)
 En effet, au lieu de récupérer le clair "Pic Sans Nom (3913 m)", nous nous retrouvons avec un binaire complétement incompréhensible !
 
-Nous rappelons que la probabilité de tomber sur une telle signature avec une base de 61 signatures est exactement de <b>1 chance sur 1 100 145</b>, ce qui explique le titre "unlucky" 
+Nous rappelons que la probabilité de tomber sur une telle signature avec une base de 61 signatures est exactement de <b>1 chance sur 524 590</b>, ce qui explique le titre "unlucky" 
 
 
 <h2> <b> II - Transformer les messages en entiers </b></h2>
@@ -130,7 +132,7 @@ ce qui nous permet de récupérer la valeur mFault (en hexadecimal) :
 
 ![mfault]({{ site.url }}/assets/mfault.png)
 
-Pour le message clair, c'est un peu plus compliqué car il faut lui appliquer le padding adéquat pour que les calculs soient bons... soit PCKS1. Après une dizaine de minutes de recherches sur le net qui ne mènent à rien, j'ai décidé d'utiliser une méthode un peu maison, j'ai récupéré un message d'un même nombre de caractères que ma chaîne avec un padding PCKS1, et ai changé les caractères par les miens... ce n'est pas une procédure habituelle... mais ça fonctionne !
+Pour le message clair, c'est un peu plus compliqué car il faut lui appliquer le padding adéquat pour que les calculs soient bons... soit PCKS1. Après une dizaine de minutes de recherches sur le net qui ne mènent à rien, j'ai décidé d'utiliser une méthode un peu maison, j'ai récupéré un message d'un même nombre de caractères que ma chaîne complété 	d'un padding PCKS1, et ai changé les caractères de cette chaîne par les miens... ce n'est pas une procédure habituelle... mais ça fonctionne !
 
 Voici donc la valeur de notre message clair :
 
@@ -195,7 +197,7 @@ qui nous génère la clé privée priv.pem suivante :
 
 ![privkey]({{ site.url }}/assets/privkey.png)
 
-<h2> <b> V - Déchiffrement du message chiffré </b></h2>
+<h2> <b> V - Déchiffrement du message</b></h2>
 
 Voici le code python permettant d'effectuer cette action
 

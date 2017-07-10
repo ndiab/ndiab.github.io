@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-06-27T22:13:46+02:00</updated><id>http://localhost:4000/</id><title type="html">NDiab</title><subtitle>Student in the University of Pierre and Marie Curie (UPMC, Paris6), I currently doing my master degree on computer sciences speciality Security and HPC.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-07-07T22:18:58+02:00</updated><id>http://localhost:4000/</id><title type="html">NDiab</title><subtitle>Student in the University of Pierre and Marie Curie (UPMC, Paris6), I currently doing my master degree on computer sciences speciality Security and HPC.
 </subtitle><entry><title type="html">Write UP - NDH XV Wargame : Unlucky [CRYPTO]</title><link href="http://localhost:4000/ctf-writeup/2017/06/26/ndhXV_unlucky.html" rel="alternate" type="text/html" title="Write UP - NDH XV Wargame  : Unlucky [CRYPTO]" /><published>2017-06-26T19:42:27+02:00</published><updated>2017-06-26T19:42:27+02:00</updated><id>http://localhost:4000/ctf-writeup/2017/06/26/ndhXV_unlucky</id><content type="html" xml:base="http://localhost:4000/ctf-writeup/2017/06/26/ndhXV_unlucky.html">&lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/nuit_hack_XV_2017.jpg&quot; alt=&quot;ndhXV&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Cet article a pour but de présenter la résolution du challenge CRYPTO unlucky présenté à la quinzième édition de la &lt;a href=&quot;https://nuitduhack.com&quot;&gt; nuit du hack &lt;/a&gt;. Ce challenge n’a pas été résolu lors de la wargame (du moins dans le temps imparti) et était récompensé de 350 points.&lt;/p&gt;
@@ -12,14 +12,16 @@
 
 &lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/unlucky.png&quot; alt=&quot;unlucky&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;Contenant une clé publique d’un serveur 32 bits avec Go 1.5.1, un message chiffré avec cette clé publique (le message que nous devrons déchiffrer) ainsi que 61 signatures interceptés avec le clair correspondant.
-L’algorithme de chiffrement utilisé ici est RSA avec des clés 4096 bits, ne présentant à première vue aucun signe de faiblesse.&lt;/p&gt;
+&lt;p&gt;Contenant une clé publique d’un serveur 32 bits, un message chiffré avec cette clé publique (le message que nous devrons déchiffrer) ainsi que 61 signatures interceptés avec le clair correspondant.
+L’algorithme de chiffrement utilisé ici est RSA avec des clés 4096 bits, ne présentant à première vue aucun signe de faiblesse. &lt;br /&gt;
+Nous savons également que le serveur utilise le language Go 1.5.1.&lt;/p&gt;
 
 &lt;h2&gt;&lt;b&gt;CVE-2015-8618&lt;/b&gt;&lt;/h2&gt;
-&lt;p&gt;Je remercie mon partenaire &lt;a href=&quot;https://twitter.com/0xBytemare&quot;&gt;@0xBytemare&lt;/a&gt; de m’avoir rapidement trouvé cette &lt;a href=&quot;http://www.openwall.com/lists/oss-security/2016/01/13/7&quot;&gt;CVE&lt;/a&gt; concernant une mise à jour de sécurité de Go v1.5.3.
+&lt;p&gt;Je remercie mon partenaire &lt;a href=&quot;https://twitter.com/_Bytemare&quot;&gt;@_Bytemare&lt;/a&gt; de m’avoir rapidement trouvé cette &lt;a href=&quot;http://www.openwall.com/lists/oss-security/2016/01/13/7&quot;&gt;CVE&lt;/a&gt; concernant une mise à jour de sécurité de Go v1.5.3.
 En effet, la vulnérabilité publiée en 2015 concerne une bibliothèque de mathématique de Go (math/big) qui est utilisée pour le chiffrement RSA. Celle-ci a la probabilité d’effectuer une erreur de calcul de 1/2^26 (1 fois sur 64 millions) sur une architecture 32 bits. Si cette erreur intervient lors d’un chiffrement RSA_CRT, cela pourrait permettre à un attaquant d’en déduire la clé privée (Détails expliqués plus bas). La CVE n’en dit pas plus quant à son exploitation, aucun POC n’est trouvable sur le net.&lt;/p&gt;
 
-&lt;p&gt;Cette CVE correspond parfaitement à notre scénario. Nous sommes dans de la pûre crypto, afin de pouvoir exploiter une telle vulnérabilité nous allons être obligés de passer par un peu de mathématiques…
+&lt;p&gt;Cette CVE correspond parfaitement à notre scénario. 
+Néanmoins, afin de pouvoir exploiter une telle vulnérabilité nous allons être obligés de passer par un peu de mathématiques…
 &lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;h2&gt;&lt;b&gt;Un peu de maths&lt;/b&gt;&lt;/h2&gt;
@@ -42,7 +44,7 @@ Pour ceux dont ils ne s’intéressent juste à casser du chiffrement sans voulo
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;p&gt;Dans RSA_CRT, le déchiffrement va donc être utilisé différement que dans un RSA classique :&lt;/p&gt;
+&lt;p&gt;Dans RSA_CRT, le déchiffrement va donc être effectué différemment d’un RSA classique :&lt;/p&gt;
 
 &lt;p&gt;       &lt;img src=&quot;http://localhost:4000/assets/RSA_CRT.png&quot; alt=&quot;unlucky&quot; /&gt;&lt;/p&gt;
 
@@ -92,14 +94,14 @@ Pour ceux dont ils ne s’intéressent juste à casser du chiffrement sans voulo
 &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;			&lt;span class=&quot;c&quot;&gt;# print clear message&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p&gt;note : le script proposé ci-dessus permet d’afficher sur le terminal la valeur du clair et la vérification se fait manuellement. Il est possible d’effectuer cette recherche de façon automatique avec un code plus évolué.&lt;/p&gt;
+&lt;p&gt;note : le script proposé ci-dessus permet d’afficher sur le terminal la valeur du clair et la vérification se fait manuellement. Il est possible d’effectuer cette recherche de façon automatique avec un code plus élaboré.&lt;/p&gt;
 
 &lt;p&gt;Après avoir testé chaque signature une par une, nous trouvons enfin une signature erronée :&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/pic_sans_nom.png&quot; alt=&quot;unlucky&quot; /&gt;
 En effet, au lieu de récupérer le clair “Pic Sans Nom (3913 m)”, nous nous retrouvons avec un binaire complétement incompréhensible !&lt;/p&gt;
 
-&lt;p&gt;Nous rappelons que la probabilité de tomber sur une telle signature avec une base de 61 signatures est exactement de &lt;b&gt;1 chance sur 1 100 145&lt;/b&gt;, ce qui explique le titre “unlucky”&lt;/p&gt;
+&lt;p&gt;Nous rappelons que la probabilité de tomber sur une telle signature avec une base de 61 signatures est exactement de &lt;b&gt;1 chance sur 524 590&lt;/b&gt;, ce qui explique le titre “unlucky”&lt;/p&gt;
 
 &lt;h2&gt; &lt;b&gt; II - Transformer les messages en entiers &lt;/b&gt;&lt;/h2&gt;
 &lt;p&gt;Afin que nous puissions effectuer nos calculs mathématiques, il faut d’abord convertir deux messages (le mauvais ainsi que le clair) sous forme d’entiers.&lt;/p&gt;
@@ -113,7 +115,7 @@ En effet, au lieu de récupérer le clair “Pic Sans Nom (3913 m)”, nous nous
 
 &lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/mfault.png&quot; alt=&quot;mfault&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;Pour le message clair, c’est un peu plus compliqué car il faut lui appliquer le padding adéquat pour que les calculs soient bons… soit PCKS1. Après une dizaine de minutes de recherches sur le net qui ne mènent à rien, j’ai décidé d’utiliser une méthode un peu maison, j’ai récupéré un message d’un même nombre de caractères que ma chaîne avec un padding PCKS1, et ai changé les caractères par les miens… ce n’est pas une procédure habituelle… mais ça fonctionne !&lt;/p&gt;
+&lt;p&gt;Pour le message clair, c’est un peu plus compliqué car il faut lui appliquer le padding adéquat pour que les calculs soient bons… soit PCKS1. Après une dizaine de minutes de recherches sur le net qui ne mènent à rien, j’ai décidé d’utiliser une méthode un peu maison, j’ai récupéré un message d’un même nombre de caractères que ma chaîne complété d’un padding PCKS1, et ai changé les caractères de cette chaîne par les miens… ce n’est pas une procédure habituelle… mais ça fonctionne !&lt;/p&gt;
 
 &lt;p&gt;Voici donc la valeur de notre message clair :&lt;/p&gt;
 
@@ -175,7 +177,7 @@ Nous avons donc maintenant notre exposant privé, c’est presque gagné !&lt;/p
 
 &lt;p&gt;&lt;img src=&quot;http://localhost:4000/assets/privkey.png&quot; alt=&quot;privkey&quot; /&gt;&lt;/p&gt;
 
-&lt;h2&gt; &lt;b&gt; V - Déchiffrement du message chiffré &lt;/b&gt;&lt;/h2&gt;
+&lt;h2&gt; &lt;b&gt; V - Déchiffrement du message&lt;/b&gt;&lt;/h2&gt;
 
 &lt;p&gt;Voici le code python permettant d’effectuer cette action&lt;/p&gt;
 
@@ -197,4 +199,7 @@ Nous avons donc maintenant notre exposant privé, c’est presque gagné !&lt;/p
 &lt;p&gt;Et nous obtenons ce résultat :
 &lt;img src=&quot;http://localhost:4000/assets/resultat.png&quot; alt=&quot;resultat&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;b&gt; FLAG = ndh2k17_Y0d3lAyE30OoO0 &lt;/b&gt;&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry></feed>
+&lt;p&gt;&lt;b&gt; FLAG = ndh2k17_Y0d3lAyE30OoO0 &lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt; &lt;br /&gt; &lt;br /&gt;
+Si vous avez la moindre question n’hésitez pas à me contacter sur &lt;a href=&quot;https://twitter.com/end_iab&quot;&gt;twitter&lt;/a&gt; ou par mail ;)&lt;/p&gt;</content><author><name></name></author><summary type="html"></summary></entry></feed>
