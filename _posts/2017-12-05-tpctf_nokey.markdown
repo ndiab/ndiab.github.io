@@ -64,7 +64,7 @@ The cipher is given by the exponentiation of a <b>primary number e</b> (modulus 
 <h3><b>b - Crack it ! </b></h3>
 In order to crack our <b>C</b>, we gonna try to find if  a prime root exist.
 For that, I scripted it :
-{% highlight python %}http://localhost:4000/assets/resultat.png
+{% highlight python %}
 from Arithmetic import *
 
 #Tab of the 1000 smaller primes
