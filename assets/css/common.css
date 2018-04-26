@@ -1,0 +1,18 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+
+.center
+{
+	margin: 0 auto;
+	display: block;
+}
+
+.big-image
+{
+	margin: 0 auto;
+	display: block;
+	width: 65%;
+}
