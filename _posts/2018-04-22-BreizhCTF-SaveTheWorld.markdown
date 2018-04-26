@@ -434,3 +434,6 @@ And the result of this code is :
 
 The flag is :
 <h2><b>bzh_2k18{C0p3RSm1tH}</b></h2>
+
+
+<b>But I'm sorry, it is too late to save the world...</b>
