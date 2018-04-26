@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Write UP - BreizhCTF  : Save The World [CRYPTO]"
-date:   2018-04-22 22:49:27 +0200
+date:   2018-04-26 13:08:27 +0200
 categories: CTF-WriteUp
 ---
 
@@ -66,7 +66,7 @@ We can determine :
 <ul>
 	<li>All generals have differents IP addresses</li>
 	<li>The IP address of the Central server is **192.168.56.105**</li>
-	<li>The generals and the Central server communicate by simple tcp packets without encryption : <br/>		The public keys used to the encryption are plain and the ciphered messages don't seems to get other layout of encryption than RSA.
+	<li>The generals and the Central server communicate by simple tcp packets without encryption : <br/>		The public keys used to the encryption are plain.
 	</li>
 </ul>
 
@@ -89,12 +89,12 @@ done
 <i>Note : This script must be run from a no-root user</i>
 
 
-It will extract all the different tcp streams founded in the **bzh.pcap** into the **output** directory.
+It will extract all the different tcp streams found in the **bzh.pcap** into the **output** directory.
 This is the list of the extracted files :
 
 ![breizhctf](/assets/bzh_2k18/streams_list.png){: .center}
 
-exactly 20 tcp streams have been extracted, let see now what are they looking :
+exactly 20 tcp streams have been extracted, let see now what are they looking like :
 
 ![breizhctf](/assets/bzh_2k18/streams_display.png){: .center}
 
@@ -113,7 +113,7 @@ This is the information from the first public key (general-0.pcap) :
 We can see that the key size is 2048 bits, and the public exponent 65537... Nothing show that a possible vulnerability exists.
 You can run any existing tools to crack this key, but nothing will return. It seems to be a perfect secure public key :/ (for the time being)
 
-But, we have to keep hope and analysing the other keys, because some keys later... we can found this key :
+But, we have to keep hope and analysing the other keys, because some keys later... we can fiund this key :
 
 ![breizhctf](/assets/bzh_2k18/key5.png){: .center}
 

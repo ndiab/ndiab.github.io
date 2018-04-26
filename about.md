@@ -4,7 +4,9 @@ title: About
 permalink: /about/
 ---
 
-Cybersecurity engineer at Alter Defense & security.
+Cryptography and offensive security lover,
+Cybersecurity Engineer at Alter Defence & Security.
+I Work on cybersecurity missions for major customers in the defense and aeronautics sectors.
 Master Graduated of the University of Pierre and Marie Curie (UPMC, Paris6).
 
 
