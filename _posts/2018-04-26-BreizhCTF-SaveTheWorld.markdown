@@ -398,14 +398,12 @@ def broadcast_attack(L : list) -> int :
 	C = CRT_list(S)
 	x = C.value
 
+	m = find_invpow(x,3)
 
 	return m
 
 
 if __name__ == '__main__':
-	
-	m = find_invpow(x,3)
-
 	# entrée de l'exposant
 	e = 3
 	# entrée des différents modules modules
